@@ -8,7 +8,6 @@ typedef struct {
 void second_func(jmp_state* s);
 
 void first_func(jmp_state* s) {
-  jmp_buf* prev_jmp = s->jmp;
   jmp_buf c_jmp;
   volatile int once = 0;
 
