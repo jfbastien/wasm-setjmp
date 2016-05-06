@@ -1,0 +1,51 @@
+sudo: false
+language: cpp
+python:
+  - "2.7"
+
+matrix:
+  include:
+
+    - env: COMPILER_VERSION=3.6
+      compiler: clang
+      addons: &clang36
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+          packages: ['cmake', 'clang-3.6']
+
+    - env: COMPILER_VERSION=3.6 COMPILER_FLAGS="-fsanitize=undefined -fno-sanitize-recover=all"
+      compiler: clang
+      addons: *clang36
+
+    - env: COMPILER_VERSION=3.6 COMPILER_FLAGS="-fsanitize=address"
+      compiler: clang
+      addons: *clang36
+
+    - env: COMPILER_VERSION=3.6 COMPILER_FLAGS="-fsanitize=thread"
+      compiler: clang
+      addons: *clang36
+
+    - env: COMPILER_VERSION=5
+      compiler: gcc
+      addons: &gcc5
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['cmake', 'nodejs', 'g++-5']
+
+before_install:
+  - export CC="${CC}-${COMPILER_VERSION}"
+  - export CXX="${CXX}-${COMPILER_VERSION}"
+  - export ASAN_OPTIONS="symbolize=1"
+
+install:
+  - pip install --user flake8
+
+before_script:
+  - flake8
+
+script:
+  - cmake . -DCMAKE_C_FLAGS="$COMPILER_FLAGS" -DCMAKE_CXX_FLAGS="$COMPILER_FLAGS"
+  - make -j2
+
+notifications:
+  email: false
