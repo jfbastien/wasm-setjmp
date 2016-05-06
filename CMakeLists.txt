@@ -53,5 +53,10 @@ file(GLOB tests "test/*.cc")
 foreach(test ${tests})
   string(REGEX REPLACE ".*test/([-a-zA-Z0-9_]+).cc$" "\\1" name "${test}")
   add_executable(test_${name} ${test})
-  add_test(${name} test_${name})
+  add_test(
+    NAME ${name}
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/check-output.py
+            --program ${CMAKE_BINARY_DIR}/test_${name}
+	    --gold ${CMAKE_SOURCE_DIR}/test/${name}.out
+    )
 endforeach()
